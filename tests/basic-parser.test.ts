@@ -47,7 +47,6 @@ test("parseCSV yields result where all CSV data is included", async() => {
   for (const row of results) {
     // Correct number of comma seperated values in each row
     expect(row.length).toEqual(2);}
-
 })
 
 // // Test for punctuation
@@ -94,13 +93,12 @@ test("parse CSV yields empty array", async() => {
 
 })
 
-// Test for empty field 
+// Test for error on empty field 
 test("parse CSV recognizes missing values", async() => {
   const results = await parseCSV(missingFields_PATH)
 
-  // Correct way to handle empty field
-  expect(results[5]).toEqual(["Luke", "N/A"])
-  expect(results[6]).toEqual(["N/A", "28"])
+  // Want to Throw errors for misformatted CSVs
+  expect(results).toThrow();
 
 })
 

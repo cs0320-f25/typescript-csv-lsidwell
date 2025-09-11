@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as readline from "readline";
-import z from 'zod'
+import * as z from 'zod'
 
 /**
  * This is a JSDoc comment. Similar to JavaDoc, it documents a public-facing
@@ -22,7 +22,7 @@ import z from 'zod'
 
 // export type Person = z.infer<typeof directorySchema>
 
-export async function parseCSV(path: string, ): Promise<string[][]> {
+export async function parseCSV(path: string): Promise<string[][]>  {
   // This initial block of code reads from a file in Node.js. The "rl"
   // value can be iterated over in a "for" loop. 
   const fileStream = fs.createReadStream(path);
@@ -43,23 +43,54 @@ export async function parseCSV(path: string, ): Promise<string[][]> {
   }
   return result
   }
+  
+export async function parseCSVwithSchema<T>(path: string, Schema: z.ZodType<T>): Promise<T[]>{
+  // // This initial block of code reads from a file in Node.js. The "rl"
+  // // value can be iterated over in a "for" loop. 
+  // const fileStream = fs.createReadStream(path);
+  // const rl = readline.createInterface({
+  //  input: fileStream,
+  //   crlfDelay: Infinity, // handle different line endings
+  // });
+    
+  // // Create an empty array to hold the results
+  // let result = []
+    
+  // // We add the "await" here because file I/O is asynchronous. 
+  // // We need to force TypeScript to _wait_ for a row before moving on. 
+  // // More on this in class soon!
+  // for await (const line of rl) {
+  //   const values = line.split(",").map((v) => v.trim());
+  //   result.push(values)
+  // }
+  // return result
 
-// Notes from Lecture 2
+  const prase_result = await parseCSV(path);
+  
+  type resultschema = z.infer<typeof Schema>
 
-// async fucntion happens after the sync fucntions do
+  const result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(prase_result)
 
-async function example() {
-  const result = await parseCSV('something')
+  if (result.success){
+    return result.data
+  }
 }
+// // Notes from Lecture 2
 
-/*
+// // async fucntion happens after the sync fucntions do
 
-Name,Credits,Email
-Tim Nelson,10,Tim_Nelson@brown.edu
-Nim Telson,11,MYAWESOMEEMAIL
+// async function example() {
+//   const result = await parseCSV('something')
+// }
 
-*/
+// /*
 
-// Use this schema as a test case
-const studentRowSchema = z.tuple([z.string(), z.coerce.number(), z.email()])
-.transform(arr => ({name: arr[0], credits: arr[1], email: arr[2]}))
+// Name,Credits,Email
+// Tim Nelson,10,Tim_Nelson@brown.edu
+// Nim Telson,11,MYAWESOMEEMAIL
+
+// */
+
+// // Use this schema as a test case
+// const studentRowSchema = z.tuple([z.string(), z.coerce.number(), z.email()])
+// .transform(arr => ({name: arr[0], credits: arr[1], email: arr[2]}))
