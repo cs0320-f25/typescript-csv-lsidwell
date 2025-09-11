@@ -22,7 +22,7 @@ import * as z from 'zod'
 
 // export type Person = z.infer<typeof directorySchema>
 
-export async function parseCSV(path: string): Promise<string[][]>  {
+export async function parseCSV<T>(path: string, Schema? : z.ZodType<T> | undefined): Promise< T[] | string[][]>  {
   // This initial block of code reads from a file in Node.js. The "rl"
   // value can be iterated over in a "for" loop. 
   const fileStream = fs.createReadStream(path);
@@ -37,44 +37,28 @@ export async function parseCSV(path: string): Promise<string[][]>  {
   // We add the "await" here because file I/O is asynchronous. 
   // We need to force TypeScript to _wait_ for a row before moving on. 
   // More on this in class soon!
-  for await (const line of rl) {
+
+  if (Schema) { 
+    for await (const line of rl) {
+      type resultschema = z.infer<typeof Schema>
+      const schema_result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(result) 
+
+      if (schema_result.success) {
+        result.push(schema_result.data)
+      }
+    }
+    return result}
+
+  else {
+    for await (const line of rl) {
     const values = line.split(",").map((v) => v.trim());
     result.push(values)
-  }
-  return result
-  }
-  
-export async function parseCSVwithSchema<T>(path: string, Schema: z.ZodType<T>): Promise<T[]>{
-  // // This initial block of code reads from a file in Node.js. The "rl"
-  // // value can be iterated over in a "for" loop. 
-  // const fileStream = fs.createReadStream(path);
-  // const rl = readline.createInterface({
-  //  input: fileStream,
-  //   crlfDelay: Infinity, // handle different line endings
-  // });
-    
-  // // Create an empty array to hold the results
-  // let result = []
-    
-  // // We add the "await" here because file I/O is asynchronous. 
-  // // We need to force TypeScript to _wait_ for a row before moving on. 
-  // // More on this in class soon!
-  // for await (const line of rl) {
-  //   const values = line.split(",").map((v) => v.trim());
-  //   result.push(values)
-  // }
-  // return result
+    }
 
-  const prase_result = await parseCSV(path);
-  
-  type resultschema = z.infer<typeof Schema>
-
-  const result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(prase_result)
-
-  if (result.success){
-    return result.data
   }
-}
+
+    return result
+  }
 // // Notes from Lecture 2
 
 // // async fucntion happens after the sync fucntions do
