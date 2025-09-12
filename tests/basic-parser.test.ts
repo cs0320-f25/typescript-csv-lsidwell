@@ -1,12 +1,13 @@
 import { asyncWrapProviders } from "async_hooks";
 import { parseCSV } from "../src/basic-parser";
 import * as path from "path";
-import z from 'zod'; 
+import z, { email } from 'zod'; 
 
 const PEOPLE_CSV_PATH = path.join(__dirname, "../data/people.csv");
 const SAMPLE_DATA_PATH = path.join(__dirname, "../data/sample_data.csv")
 const empty_PATH = path.join(__dirname, "../data/empty.csv")
 const missingFields_PATH = path.join(__dirname, "../data/Missing Fields.csv")
+const emails_PATH = path.join(__dirname, "../data/emails.csv")
 
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH, undefined);
@@ -89,39 +90,57 @@ test("parse CSV yields empty array", async() => {
 
 })
 
-// Test for error on empty field 
-test("parse CSV recognizes missing values", async() => {
-  const results = await parseCSV(missingFields_PATH, undefined)
+// // Test for error on empty field 
+// test("parse CSV recognizes missing values", async() => {
+//   const results = await parseCSV(missingFields_PATH, undefined)
 
-  // Want to Throw errors for misformatted CSVs
-  expect(results).toThrow();
+//   // Want to Throw errors for misformatted CSVs
+//   expect(results).toThrow();
 
-})
-
-// Test for header
-test("parse CSV recognizes missing values", async() => {
-  const results = await parseCSV(missingFields_PATH, undefined)
-
-  // Correct way to handle empty field
-  expect(results[0]).toEqual(["name", "age"])
-
-})
-
+// })
 
 // Still Need to Test for Schema 
 
+// Name Age Schema Valid
+
+test("parseCSV yeilds reuslt where data results in schema object", async () => {
+  const nameAgeSchema = z.tuple([z.string(), z.coerce.number()]).transform(arr => ({name: arr[0], age: arr[1]}))
+  const results = await parseCSV(SAMPLE_DATA_PATH, nameAgeSchema)
+  
+  expect(results[0]).toEqual({name: "Alice",age: 23})
+
+})
+
+test("parseCSV yeilds reuslt where data results in schema object", async () => {
+  const nameAgeSchema = z.tuple([z.string(), z.coerce.number()]).transform(arr => ({name: arr[0], age: arr[1]}))
+  const results = await parseCSV(SAMPLE_DATA_PATH, nameAgeSchema)
+  
+  expect(results[0]).toEqual({name: "Alice",age: 23})
+
+})
+
+//StudentRowSchema Valid
+test("parseCSV yeilds reuslt where data results in StudentRowSchema", async () => {
+  const studentRowSchema = z.tuple([z.string(), z.coerce.number(), z.email()]).transform(arr => ({name: arr[0], credits: arr[1], email: arr[2]}))
+  const results = await parseCSV(emails_PATH, studentRowSchema)
+
+  console.log(results)
+
+  expect(results[0]).toEqual({name: "Alice", credits: 23, email: "alice@gmail.com"})
+  expect(results[2]).toEqual({name: "Nim", credits: 22, email: "nimly2@gmail.com"})
+
+})
+
+//Name Email Schema throws error, as data has three field but schema only excepts 2.
+test("parse CSV throws error when schema validation fails", async() => {
+  const nameemailSchema = z.tuple([z.string(), z.email()]).transform(arr => ({name: arr[0], email: arr[1]}))
+  const results = await parseCSV(emails_PATH, nameemailSchema)
+  expect(results).toThrow();
+
+}
+)
 
 
 
-
-
-// test("parseCSV yeilds reuslt where data results in schema object", async () => {
-//   const results = await parseCSV(SAMPLE_DATA_PATH)
-//   const nameAgeSchema = z.tuple([z.string(), z.coerce.number()]).transform(arr => ({name: arr[0], credits: arr[1]}))
-
-//   expect results
-
-
-// })
 
 

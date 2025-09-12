@@ -40,12 +40,16 @@ export async function parseCSV<T>(path: string, Schema? : z.ZodType<T> | undefin
 
   if (Schema) { 
     for await (const line of rl) {
+      const values = line.split(",").map((v) => v.trim());
       type resultschema = z.infer<typeof Schema>
-      const schema_result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(result) 
+      const schema_result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(values) 
 
       if (schema_result.success) {
         result.push(schema_result.data)
       }
+      // if (!schema_result.success) {
+      //   throw Error("Schema validation failed")
+      // }
     }
     return result}
 

@@ -80,9 +80,9 @@ List of Issues with CSV Parser
 
                 -  As a User of the application, I am able to recieve an error when my csv is misformatted, so I can have a cleaner CSV parse, when the data it correctlty formatted
 
-            - LLM : Options Interface: Extensibility
+            - LLM : Handling Quotes: Extensibility
 
-                - As a User of the application, I am able to have an options interface to filter/toggle which features I want on in the parser, so I can receive a more concise, specific parts best suited to my needs.
+                - As a User of the application, I am able to have feature to preserve commas in a quote, where I dont want the commas to seperate it out, thus ensuring that the correct values pass to the correct values.
 
             - Both - Header Row Support : Functionallity
 

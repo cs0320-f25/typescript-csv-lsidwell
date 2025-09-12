@@ -1,7 +1,7 @@
 name,age
 Alice,23
-# Comma In quote
-Bob,"thirty,four"
+# In quote
+Bob,"thirty, four"
 # Whitespace
 Charlie,      25
 Nim,22:
