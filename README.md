@@ -118,3 +118,4 @@ I used generative AI to generate ideas on what a fucntional CSV parser needs, af
 #### Total estimated time it took to complete project:
 5 Hours 
 #### Link to GitHub Repo:  
+https://github.com/cs0320-f25/typescript-csv-lsidwell
