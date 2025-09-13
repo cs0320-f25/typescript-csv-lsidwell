@@ -38,23 +38,28 @@ export async function parseCSV<T>(path: string, Schema? : z.ZodType<T> | undefin
   // We need to force TypeScript to _wait_ for a row before moving on. 
   // More on this in class soon!
 
-  if (Schema) { 
-    for await (const line of rl) {
+  const rl_iter = rl[Symbol.asyncIterator]();
+  await rl_iter.next() // skip the first line (header)
+
+  if (Schema) {
+    for await (const line of rl_iter) {
       const values = line.split(",").map((v) => v.trim());
+      
       type resultschema = z.infer<typeof Schema>
       const schema_result: z.ZodSafeParseResult<resultschema> = Schema.safeParse(values) 
 
-      if (schema_result.success) {
-        result.push(schema_result.data)
+
+      if (!schema_result.success) {
+        throw Error("Schema Validation Failed")
       }
-      // if (!schema_result.success) {
-      //   throw Error("Schema validation failed")
-      // }
+
+      result.push(schema_result.data)
+    
     }
     return result}
 
   else {
-    for await (const line of rl) {
+    for await (const line of rl_iter) {
     const values = line.split(",").map((v) => v.trim());
     result.push(values)
     }
