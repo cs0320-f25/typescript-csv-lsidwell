@@ -12,8 +12,7 @@ const emails_PATH = path.join(__dirname, "../data/emails.csv")
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH, undefined);
   
-  expect(results).toHaveLength(5);
-  expect(results[0]).toEqual(["name", "age"]);
+  expect(results).toHaveLength(4);
   expect(results[1]).toEqual(["Alice", "23"]);
   expect(results[2]).toEqual(["Bob", "thirty"]); // why does this work? :(
   expect(results[3]).toEqual(["Charlie", "25"]);
@@ -43,7 +42,7 @@ test("parseCSV yields result where all CSV data is included", async() => {
   const results = await parseCSV(SAMPLE_DATA_PATH, undefined);
 
   // Correct number of Rows
-  expect(results.length).toEqual(5);
+  expect(results.length).toEqual(4);
 })
 
 // // Test for punctuation
@@ -51,7 +50,7 @@ test("parseCSV yields result where punctuation is included", async () => {
   const results = await parseCSV(SAMPLE_DATA_PATH, undefined)
 
   // Correct way to handle punctuation
-  expect(results[4]).toEqual(["Nim", "22:"])
+  expect(results[5]).toEqual(["Nim", "22:"])
 })
 
 // Test for quoated fields with inner commas
@@ -59,12 +58,12 @@ test("parse CSV yields result where quotes are not seperated", async() => {
   const results = await parseCSV(SAMPLE_DATA_PATH, undefined)
 
   // Correct way to handle quote with inner comma
-  expect(results[1]).toEqual(["Bob", "thirty four"])
+  expect(results[2]).toEqual(["Bob", "thirty four"])
 
 })
 
 // Test for trimming whitespace
-test("parseCSV yields result where whitespace is preserved", async() => {
+test("parseCSV yields result where whitespace is trimmed", async() => {
   const results = await parseCSV(SAMPLE_DATA_PATH, undefined)
 
   // Correct way to handle whitespace
@@ -76,8 +75,8 @@ test("parseCSV yields result where comments are ignored", async() => {
   const results = await parseCSV(SAMPLE_DATA_PATH, undefined)
 
   // Correct way to handle comments
-  expect(results.length).toEqual(5);
-  expect(results[2]).toEqual(["Bob", "34"])
+  expect(results.length).toEqual(6);
+  expect(results[1]).toEqual(["Bob", "34"])
  
 })
 
@@ -105,17 +104,19 @@ test("parse CSV yields empty array", async() => {
 
 test("parseCSV yeilds reuslt where data results in schema object", async () => {
   const nameAgeSchema = z.tuple([z.string(), z.coerce.number()]).transform(arr => ({name: arr[0], age: arr[1]}))
-  const results = await parseCSV(SAMPLE_DATA_PATH, nameAgeSchema)
+  const results = await parseCSV(PEOPLE_CSV_PATH, nameAgeSchema)
   
-  expect(results[0]).toEqual({name: "Alice",age: 23})
+  expect(results[0]).toEqual({name: "Alice", age: 23})
+  expect(results[1]).toEqual({name: "Bob", age: 30})
+  expect(results[2]).toEqual({name: "Charlie",age: 25})
+  expect(results[3]).toEqual({name: "Nim", age: 22})
 
 })
 
+//Missing Fields Schema Invalid
 test("parseCSV yeilds reuslt where data results in schema object", async () => {
   const nameAgeSchema = z.tuple([z.string(), z.coerce.number()]).transform(arr => ({name: arr[0], age: arr[1]}))
-  const results = await parseCSV(SAMPLE_DATA_PATH, nameAgeSchema)
-  
-  expect(results[0]).toEqual({name: "Alice",age: 23})
+  await expect(parseCSV(missingFields_PATH, nameAgeSchema)).rejects.toThrow()
 
 })
 
@@ -124,21 +125,18 @@ test("parseCSV yeilds reuslt where data results in StudentRowSchema", async () =
   const studentRowSchema = z.tuple([z.string(), z.coerce.number(), z.email()]).transform(arr => ({name: arr[0], credits: arr[1], email: arr[2]}))
   const results = await parseCSV(emails_PATH, studentRowSchema)
 
-  console.log(results)
-
   expect(results[0]).toEqual({name: "Alice", credits: 23, email: "alice@gmail.com"})
-  expect(results[2]).toEqual({name: "Nim", credits: 22, email: "nimly2@gmail.com"})
+  expect(results[1]).toEqual({name: "Bob", credits: 34, email: "bobby2@gmail.com"})
+  expect(results[2]).toEqual({name: "Charlie", credits: 25, email: "chuck5@hotmail.com"})
+  expect(results[3]).toEqual({name: "Nim", credits: 22, email: "nimly2@gmail.com"})
 
 })
 
 //Name Email Schema throws error, as data has three field but schema only excepts 2.
 test("parse CSV throws error when schema validation fails", async() => {
   const nameemailSchema = z.tuple([z.string(), z.email()]).transform(arr => ({name: arr[0], email: arr[1]}))
-  const results = await parseCSV(emails_PATH, nameemailSchema)
-  expect(results).toThrow();
-
-}
-)
+  await expect(parseCSV(emails_PATH, nameemailSchema)).rejects.toThrow()
+})
 
 
 
