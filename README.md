@@ -86,7 +86,7 @@ List of Issues with CSV Parser
 
             - Both - Header Row Support : Functionallity
 
-                - As a User of the application, I am able to seperate the header row form the csv parse object, so I can have a cleaner, more structured parse, which makes the data more easily readable
+                - As a User of the application, I am able to seperate the header row form the csv parse object, and implement it into the schema object, so I can have a cleaner, more structured parse, which makes the data more easily readable
         
         - Edge Cases:
             - Me : Handiling Whitespaces: Extensibility
@@ -99,16 +99,22 @@ List of Issues with CSV Parser
 ### 1340 Supplement
 
 - #### 1. Correctness
+ - A CSVParser needs to handle commas in quotes, needs to throw errors when a file is misformatted, needs to handle whitespace and needs to ignore comment lines and handle line splicing in the middle of a statments, along with the basic fucntionality of splitting on a delimiter. The program should ensure the most accurate parsing of a file.
 
 - #### 2. Random, On-Demand Generation
+- With using a randomly generated CSV, I would be able to test for a vairty of different nuances all exitsing in 1 file. This would be a true test for the parser, as the variety of nuances would enlighten if the parse has shortcomings. It would be the ultimate test to see if it can function flawlessly. It would be the ultimate tool to test.
 
 - #### 3. Overall experience, Bugs encountered and resolved
-#### Errors/Bugs:
+#### Errors/Bugs: 
+- In this sprint I encountered a few bugs. The first bug I encountered, were some issues with the undefined type. In order to fix the bug, I went and changed the parse code, to have two differeent for loops, with one for schema, and one if the fucntion didnt have schema, instead of just one for loop. This structure made the code make more sense to me. I also encountered an error where the header column would fail the schema, bevcasue it was the header column. I had to do some research to find out a way to bypass the header column, which allowed the tests to pass,
 #### Tests:
+- 
 #### How To…
 
 #### Team members and contributions (include cs logins):
 
-#### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):
+#### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):\
+I used generative AI to generate ideas on what a fucntional CSV parser needs, after I had exhausted my ideas. I also used generative AI to help figure out different methods that worked with the readline interface in order to exclude the header row from the schema validation.
 #### Total estimated time it took to complete project:
+5 Hours 
 #### Link to GitHub Repo:  

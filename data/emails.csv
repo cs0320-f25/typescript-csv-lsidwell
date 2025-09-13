@@ -1,5 +1,5 @@
-name,age
+name,age,email
 Alice, 23, alice@gmail.com
-Bob,"34", bobby2@yahoo.com
+Bob,34, bobby2@gmail.com
 Charlie,      25 , chuck5@hotmail.com
 Nim,22, nimly2@gmail.com
